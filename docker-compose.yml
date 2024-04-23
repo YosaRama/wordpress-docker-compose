@@ -1,0 +1,40 @@
+version: "3.9"
+
+name: wordpress-docker-compose
+services:
+  mysql:
+    container_name: database
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  wordpress:
+    container_name: application
+    image: wordpress
+    depends_on:
+      - mysql
+    ports:
+      - 8000:80
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./wp_data:/var/www/html
+      - ./wordpress.ini:/usr/local/etc/php/conf.d/wordpress.ini
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  wp_data:
